@@ -1,0 +1,18 @@
+{
+  "name": "knox-gable-hostinger",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Knox & Gable website and registration API",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "pg": "^8.22.0"
+  }
+}
