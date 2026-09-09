@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
-import pg from "pg";
+import mysql from "mysql2/promise";
 
 const { Pool } = pg;
 const __filename = fileURLToPath(import.meta.url);
@@ -25,7 +25,27 @@ if (!Number.isInteger(port) || port <= 0) {
   throw new Error(`Invalid PORT value: ${process.env.PORT}`);
 }
 
-const pool = new Pool({ connectionString: databaseUrl });
+function parseDatabaseUrl(url) {
+  const u = new URL(url);
+  return {
+    host: u.hostname,
+    port: u.port ? Number(u.port) : 3306,
+    user: decodeURIComponent(u.username),
+    password: decodeURIComponent(u.password),
+    database: u.pathname.replace(/^\//, ""),
+  };
+}
+
+const dbConfig = parseDatabaseUrl(databaseUrl);
+const pool = mysql.createPool({
+  host: dbConfig.host,
+  port: dbConfig.port,
+  user: dbConfig.user,
+  password: dbConfig.password,
+  database: dbConfig.database,
+  waitForConnections: true,
+  connectionLimit: 10,
+});
 const app = express();
 const adminToken = crypto
   .createHmac("sha256", adminPassword)
@@ -95,11 +115,9 @@ app.post("/api/registrations", async (req, res) => {
     return;
   }
 
-  const result = await pool.query(
+  const [result] = await pool.execute(
     `INSERT INTO registrations (full_name, email, phone, amazon_order_id)
-     VALUES ($1, $2, $3, $4)
-     RETURNING id, full_name AS "fullName", email, phone,
-               amazon_order_id AS "amazonOrderId", created_at AS "createdAt"`,
+     VALUES (?, ?, ?, ?)`,
     [
       parsed.data.fullName,
       parsed.data.email,
@@ -108,7 +126,15 @@ app.post("/api/registrations", async (req, res) => {
     ],
   );
 
-  res.status(201).json(normalizeRegistration(result.rows[0]));
+  const insertId = result.insertId;
+  const [rows] = await pool.execute(
+    `SELECT id, full_name AS fullName, email, phone,
+            amazon_order_id AS amazonOrderId, created_at AS createdAt
+     FROM registrations WHERE id = ?`,
+    [insertId],
+  );
+
+  res.status(201).json(normalizeRegistration(rows[0]));
 });
 
 app.post("/api/admin/login", (req, res) => {
@@ -130,14 +156,14 @@ app.get("/api/admin/registrations", async (req, res) => {
     return;
   }
 
-  const result = await pool.query(
-    `SELECT id, full_name AS "fullName", email, phone,
-            amazon_order_id AS "amazonOrderId", created_at AS "createdAt"
+  const [rows] = await pool.execute(
+    `SELECT id, full_name AS fullName, email, phone,
+            amazon_order_id AS amazonOrderId, created_at AS createdAt
      FROM registrations
      ORDER BY created_at DESC`,
   );
 
-  res.json(result.rows.map(normalizeRegistration));
+  res.json(rows.map(normalizeRegistration));
 });
 
 app.use(express.static(publicDir, { index: "index.html" }));

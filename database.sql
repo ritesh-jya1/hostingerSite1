@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS registrations (
-  id SERIAL PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   full_name TEXT NOT NULL,
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
   amazon_order_id TEXT NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS registrations_created_at_idx
-  ON registrations (created_at DESC);
+CREATE INDEX registrations_created_at_idx
+  ON registrations (created_at);
