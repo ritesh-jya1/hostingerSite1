@@ -5,7 +5,6 @@ import express from "express";
 import cors from "cors";
 import mysql from "mysql2/promise";
 
-const { Pool } = pg;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, "public");
@@ -181,6 +180,27 @@ app.use((error, _req, res, _next) => {
   res.status(500).json({ error: "Something went wrong. Please try again." });
 });
 
-app.listen(port, () => {
-  console.log(`Knox & Gable is listening on port ${port}`);
-});
+async function start() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS registrations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        full_name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        amazon_order_id TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX registrations_created_at_idx (created_at)
+      )
+    `);
+
+    app.listen(port, () => {
+      console.log(`Knox & Gable is listening on port ${port}`);
+    });
+  } catch (error) {
+    console.error("Unable to initialise the registration database.", error);
+    process.exit(1);
+  }
+}
+
+start();

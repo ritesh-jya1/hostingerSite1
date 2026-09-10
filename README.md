@@ -4,7 +4,7 @@ Short guide for running and deploying this project.
 
 ## Requirements
 - Node.js >= 18
-- PostgreSQL (if using the registrations API)
+- MySQL (if using the registrations API)
 
 ## Run locally
 1. Install dependencies:
@@ -16,7 +16,7 @@ npm install
 2. Provide environment variables (example `.env`):
 
 ```
-DATABASE_URL=postgres://USER:PASSWORD@HOST:PORT/DATABASE
+DATABASE_URL=mysql://USER:PASSWORD@HOST:3306/DATABASE
 ADMIN_PASSWORD=your-admin-password
 PORT=3000
 ```
@@ -72,11 +72,12 @@ This folder is a complete production package for the Knox & Gable website. It co
 
 ## Before uploading
 
-1. Create a PostgreSQL database in Hostinger or use another PostgreSQL provider.
-2. Run `database.sql` once in that database.
+1. Create a MySQL database in Hostinger or use another MySQL provider.
+2. The app creates the registration table automatically at startup. `database.sql`
+   is retained for manual imports.
 3. Keep the database connection string ready. It normally looks like:
 
-   `postgresql://username:password@hostname:5432/database_name`
+   `mysql://username:password@hostname:3306/database_name`
 
 4. Choose a strong value for `ADMIN_PASSWORD`.
 
