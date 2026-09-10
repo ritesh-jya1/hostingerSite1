@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'db_host' => 'srv905.hstgr.io',
+    'db_host' => 'localhost',
     'db_port' => 3306,
     'db_name' => 'u939653449_noxapp',
     'db_user' => 'u939653449_noxapp',

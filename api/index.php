@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__ . '/error.log');
 
 function respond(int $status, array $body): void
 {
