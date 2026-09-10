@@ -1,6 +1,16 @@
 # Knox & Gable — Hostinger deployment
 
-Short guide for running and deploying this project.
+This repository contains both the original Node.js implementation and the PHP
+production implementation for Hostinger Business Web Hosting.
+
+## Current production deployment
+
+Deploy `php-production` archive contents as a static site. It contains the
+pre-built front end, PHP API, and Apache rewrite rules; no Node.js runtime is
+required. Before packaging, copy `api/config.php.example` to `api/config.php`
+and set real credentials. `api/config.php` is intentionally ignored by Git.
+
+The PHP API creates the registrations table automatically on its first request.
 
 ## Requirements
 - Node.js >= 18

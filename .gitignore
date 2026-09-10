@@ -1,6 +1,7 @@
 node_modules/
 .env
 .env.local
+api/config.php
 .DS_Store
 npm-debug.log*
 coverage/
